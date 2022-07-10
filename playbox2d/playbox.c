@@ -2,6 +2,8 @@
 #include "maths.h"
 #include "platform.h"
 
+extern PlaydateAPI* pd;
+
 static const lua_reg worldClass[];
 static const lua_reg bodyClass[];
 static const lua_reg jointClass[];
@@ -12,6 +14,8 @@ static const lua_reg jointClass[];
 
 void registerPlaybox(void) {
   const char* err = NULL;
+
+  pd->system->logToConsole("[%s]", __PRETTY_FUNCTION__);
   
   // Register body
   if(!pd->lua->registerClass(CLASSNAME_BODY, bodyClass, NULL, 0, &err)) {
@@ -30,6 +34,13 @@ void registerPlaybox(void) {
     pb_log("playbox: Failed to register world class. %s", err);
     return;
   }
+
+  pd->system->logToConsole(" -> registering boxtest class...", __PRETTY_FUNCTION__);
+  if(!pd->lua->registerClass("boxtest", libplaybox2d, NULL, 0, &err) )
+    pd->system->logToConsole("%s:%i: registerClass failed, %s", __FILE__, __LINE__, err);
+  else
+    pd->system->logToConsole("      '-- register worked i guess?", __PRETTY_FUNCTION__);
+
 }
 
 // UTILITIES
@@ -421,3 +432,8 @@ static const lua_reg worldClass[] = {
 { "getNumberOfContacts", playbox_world_getNumberOfContacts },
 { NULL, NULL }
 };
+
+int libplaybox2d_test(lua_State* L) {
+  pd->system->logToConsole("[%s]", __PRETTY_FUNCTION__);
+  return 1;
+}
